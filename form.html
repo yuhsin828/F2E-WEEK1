@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>form</title>
+</head>
+
+<body>
+    <h1>訂餐表單</h1>
+    <a href="index.html">return</a>
+    
+    <form action="/example.html" method="POST">
+        <br>
+        <label for="user-name">帳號：</label>
+        <input id="user-name" type="text" name="User-Name">
+        <!-- label的for 對應到 input的id -->
+        <br>
+
+        <label for="user-pw">密碼：</label>
+        <input id="user-pw" type="password" name="User-Password">
+        <!-- type="password" 輸入是密碼隱藏形式 -->
+        <br>
+
+        <label for="grade">年級：</label>
+        <input id="grade" type="number" name="grade" step="1" min="1" max="6">
+        <!-- step="1" 數字選擇，加減1單位 -->
+
+        <section class="class">
+            <label for="class">班級：</label>
+            <span>1</span>
+            <input id="class" type="range" name="class" min="1" max="3" step="1">
+            <span>3</span>
+            <!-- 滑桿 -->
+        </section>
+
+        <section class="吃什麼">
+            <label for="bun">我要吃</label>
+            <!--select下拉選單-->
+            <select name="吃什麼" id="吃什麼">
+                <option value="sesame">大腸麵線</option>
+                <option value="potato">蚵仔麵線</option>
+                <option value="peanut">綜合麵線</option>
+            </select>
+        </section>
+
+        <section class="加什麼">
+            <span>我要加</span>
+            <input id="辣" type="checkbox" name="加什麼" value="辣">
+            <label for="辣">辣</label>
+            <!--type="checkbox"可複選-->
+            <input id="蒜頭" type="checkbox" name="加什麼" value="蒜頭">
+            <label for="蒜頭">蒜頭</label>
+            <input id="香菜" type="checkbox" name="加什麼" value="香菜">
+            <label for="香菜">香菜</label>
+            <input id="都不要" type="checkbox" name="加什麼" value="都不要">
+            <label for="都不要">都不要</label>
+            <!--每個選項的name可以是一樣的，代表同一題，但id、for唯一-->
+        </section>
+
+        <section class="飲料">
+            <label for="飲料">我要喝</label>
+            <input list="飲料選項" id="飲料" name="飲料">
+            <!--datalist下拉選單，可搜尋-->
+            <datalist id="飲料選項">
+                <option value="紅茶"></option>
+                <option value="奶茶"></option>
+                <option value="綠茶"></option>
+                <option value="豆漿"></option>
+                <option value="咖啡"></option>
+                <option value="可樂"></option>
+                <option value="雪碧"></option>
+                <option value="柳橙汁"></option>
+                <option value="玉米濃湯"></option>
+                <option value="我確定不喝"></option>
+            </datalist>
+        </section>
+        <br>
+
+        <section class="機器人">
+            <span>身分認證</span>
+            <br>
+            <input id="是" type="radio" name="機器人" value="是">
+            <label for="是">我是機器人</label>
+            <!--type="radio"單選題-->
+            <input id="不是" type="radio" name="機器人" value="不是">
+            <label for="不是">我不是機器人</label>
+        </section>
+
+        <section class="備註">
+            <label for="備註">備註</label>
+            <br>
+            <!--textarea輸入段落文字-->
+            <textarea id="備註" name="備註" rows="3" cols="40">輸入
+            </textarea>
+        </section>
+
+        <section class="送出">
+            <!--submit送出-->
+            <input type="submit" value="送出">
+        </section>
+
+    </form>
+</body>
+
+</html>

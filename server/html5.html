@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<!--
+	NOTES:
+	1. All tokens are represented by '$' sign in the template.
+	2. You can write your code only wherever mentioned.
+	3. All occurrences of existing tokens will be replaced by their appropriate values.
+	4. Blank lines will be removed automatically.
+	5. Remove unnecessary comments before creating your template.
+-->
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="authoring-tool" content="Adobe_Animate_CC">
+<title>html5</title>
+<!-- write your code here -->
+<script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+<script src="html5.js?1606456386456"></script>
+<script>
+var canvas, stage, exportRoot, anim_container, dom_overlay_container, fnStartAnimation;
+function init() {
+	canvas = document.getElementById("canvas");
+	anim_container = document.getElementById("animation_container");
+	dom_overlay_container = document.getElementById("dom_overlay_container");
+	var comp=AdobeAn.getComposition("72A7FD7535E89B4B8C7F4806F480577C");
+	var lib=comp.getLibrary();
+	var loader = new createjs.LoadQueue(false);
+	loader.addEventListener("fileload", function(evt){handleFileLoad(evt,comp)});
+	loader.addEventListener("complete", function(evt){handleComplete(evt,comp)});
+	var lib=comp.getLibrary();
+	loader.loadManifest(lib.properties.manifest);
+}
+function handleFileLoad(evt, comp) {
+	var images=comp.getImages();	
+	if (evt && (evt.item.type == "image")) { images[evt.item.id] = evt.result; }	
+}
+function handleComplete(evt,comp) {
+	//This function is always called, irrespective of the content. You can use the variable "stage" after it is created in token create_stage.
+	var lib=comp.getLibrary();
+	var ss=comp.getSpriteSheet();
+	var queue = evt.target;
+	var ssMetadata = lib.ssMetadata;
+	for(i=0; i<ssMetadata.length; i++) {
+		ss[ssMetadata[i].name] = new createjs.SpriteSheet( {"images": [queue.getResult(ssMetadata[i].name)], "frames": ssMetadata[i].frames} )
+	}
+	exportRoot = new lib.html5();
+	stage = new lib.Stage(canvas);	
+
+
+
+	var myPlane = exportRoot.plane_mc;
+	var step = 10;
+	var eNum = 0;
+	var eCount = 0;
+	var ePool = new Array();
+	var score = 0;
+	var score_txt = exportRoot.score_txt;
+
+	window.addEventListener("keydown", myControl);
+	stage.addEventListener("tick", stageCount);
+	myPlane.addEventListener("tick", myMotion);
+
+	function myControl(e) {
+		if (e.keyCode == 39) {
+			step = 10;
+		} else if (e.keyCode == 37) {
+			step = -10;
+		}
+		if (e.keyCode == 32) {
+			setMyBullet();
+		}
+	}
+
+	function stageCount(e){}
+
+	function myMotion(e) {
+		var mc = e.currentTarget;
+		mc.x += step;
+		if (mc.x >= 430) {
+			mc.x = 430;
+		} else if (mc.x <= 45) {
+			mc.x = 45;
+		}
+	}
+
+	function setMyBullet() {
+		var mc = new lib.bullet();
+		mc.x = myPlane.x;
+		mc.y = myPlane.y;
+		mc.addEventListener("tick", bulletMotion);
+		stage.addChild(mc);
+	}
+
+	function bulletMotion(e) {
+		var mc = e.currentTarget;
+		mc.y -= 10;
+		if (mc.y <= -10) {
+			mc.removeEventListener("tick", bulletMotion);
+			stage.removeChild(mc);
+		}
+		for (var i = 0; i < ePool.length; i++) {
+			if (hitBounds(mc,ePool[i])) {
+				var mc2= new lib.explo();
+				mc2.x=mc.x;
+				mc2.y=mc.y;
+				mc2.addEventListener("tick", exploMotion);
+				stage.addChild(mc2);
+				
+				stage.removeChild(mc);
+				mc.removeEventListener("tick", bulletMotion);
+				ePool[i].y += 600;
+				score++;
+				score_txt.text = score.toString();
+			}
+		}
+	}
+
+	function exploMotion(e){
+		var mc=e.currentTarget;
+		if(mc.currentFrame==mc.totalFrames-1){
+			stage.removeChild(mc);
+			mc.removeEventListener("tick", exploMotion);
+		}
+	}
+
+
+	function stageCount(e) {
+		eNum++;
+		if (eNum == 30) {
+			eNum = 0;
+			setPlane()
+		}
+	}
+
+	function setPlane() {
+		eCount++;
+		var mc = new lib.plane2();
+		mc.name = "ee" + eCount;
+		mc.y = -30;
+		mc.x = Math.floor(Math.random() * 5) * 100 + 40;
+		ePool.push(mc);
+		mc.addEventListener("tick", planeMotion);
+		stage.addChild(mc);
+	}
+
+	function planeMotion(e) {
+		var mc = e.currentTarget;
+		mc.y += 5;
+		if (mc.y >= 400) {
+			mc.removeEventListener("tick", planeMotion);
+			removeFromPool(mc);
+			stage.removeChild(mc);
+		}
+	}
+
+	function removeFromPool(mc) {
+		for (var i = 0; i < ePool.length; i++) {
+			if (ePool[i].name == mc.name) {
+				ePool.splice(i);
+			}
+		}
+		console.log(ePool.length);
+	}
+
+	function hitBounds(mc1, mc2) {
+	  var m1x = mc1.x;
+	  var m1y = mc1.y;
+	  var m1w = mc1.nominalBounds.width;
+	  var m1h = mc1.nominalBounds.height;
+	  var m2x = mc2.x;
+	  var m2y = mc2.y;
+	  var m2w = mc2.nominalBounds.width;
+	  var m2h = mc2.nominalBounds.height;
+	  return m1x < m2x + m2w && m1x + m1w > m2x && m1y < m2y + m2h &&m1y + m1h > m2y;
+	}
+	
+	//Registers the "tick" event listener.
+	fnStartAnimation = function() {
+		stage.addChild(exportRoot);
+		createjs.Ticker.framerate = lib.properties.fps;
+		createjs.Ticker.addEventListener("tick", stage);
+	}	    
+	//Code to support hidpi screens and responsive scaling.
+	AdobeAn.makeResponsive(false,'both',false,1,[canvas,anim_container,dom_overlay_container]);	
+	AdobeAn.compositionLoaded(lib.properties.id);
+	fnStartAnimation();
+}
+</script>
+<!-- write your code here -->
+</head>
+<body onload="init();" style="margin:0px;">
+	<h1>射擊小遊戲</h1>
+	<a href="/index.html">return</a>
+	<br>
+	<br>
+	<div id="animation_container" style="background-color:rgba(255, 255, 255, 1.00); width:480px; height:360px">
+		<canvas id="canvas" width="480" height="360" style="position: absolute; display: block; background-color:rgba(255, 255, 255, 1.00);"></canvas>
+		<div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:480px; height:360px; position: absolute; left: 0px; top: 0px; display: block;">
+		</div>
+	</div>
+</body>
+</html>
